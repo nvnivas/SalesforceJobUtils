@@ -1,0 +1,99 @@
+from simple_salesforce import Salesforce
+import csv
+sf = Salesforce(username='srinivas.n@test.com.dev', password='pwdxxxxx', security_token='', sandbox=True)
+led = sf.Lead.get('00Qf000000xxxxx')
+
+with open("SoqlInput.csv") as f_obj:
+    reader = csv.DictReader(f_obj, delimiter=',')
+    #out_file = open('SoqlOutput.csv', 'wb')
+    #writer = csv.DictWriter(out_file, delimiter=',',led)
+    #writer.writeheader()
+    out_file = csv.writer(open("out.csv", "w", newline=''))
+    header = [key for key in led.keys()]
+    out_file.writerow("id, Email, FirstName, LastName, OwnerId".split(','))
+    #out_file.writeheader()
+    st=[]
+    i=0
+    for line in reader:
+        st.append(line["ID"])
+        i+=1
+        if i == 2:
+           st = tuple(st)
+           s1 = "SELECT id, Email, FirstName, LastName, OwnerId FROM Lead WHERE ID IN "+str(st)
+           print(s1)
+           result = sf.query(s1)
+           print(result.get('records'))
+           for tmp in result.get('records'):
+               out_file.writerow([tmp.get(key) for key in tmp.keys()][1:] )
+           i=0
+           st=[]     
+
+
+
+
+
+'''
+with open("SoqlInput.csv") as f_obj:
+    reader = csv.DictReader(f_obj, delimiter=',')
+    #out_file = open('SoqlOutput.csv', 'wb')
+    #writer = csv.DictWriter(out_file, delimiter=',',led)
+    #writer.writeheader()
+    out_file = csv.writer(open("out.csv", "w", newline=''))
+    header = [key for key in led.keys()]
+    out_file.writerow([key for key in led.keys()][1:] )
+    #out_file.writeheader()
+    for line in reader:
+        print(line["ID"])
+        lead1 = sf.Lead.get(line["ID"])
+        out_file.writerow([lead1.get(key) for key in lead1.keys()][1:] )
+'''
+'''       
+reader = csv.DictReader(open("SoqlInput.csv"), delimiter=',')
+st = []
+for line in reader:
+    st.append(line["ID"])
+st = tuple(st)
+print(st)
+s1 = "SELECT id, Email, FirstName, LastName, OwnerId FROM Lead WHERE ID IN "+str(st)
+print(s1)
+#result = sf.query(s1)
+#print(result) 
+
+
+
+
+ 
+#----------------------------------------------------------------------
+def csv_dict_reader(file_obj):
+    """
+    Read a CSV file using csv.DictReader
+    """
+    reader = csv.DictReader(file_obj, delimiter=',')
+    for line in reader:
+        print(line["first_name"]),
+        print(line["last_name"])
+ 
+#----------------------------------------------------------------------
+#if __name__ == "__main__":
+#    with open("data.csv") as f_obj:
+#        csv_dict_reader(f_obj)        
+
+
+
+
+
+#----------------------------------------------------------------------
+def csv_reader(file_obj):
+    """
+    Read a csv file
+    """
+    reader = csv.reader(file_obj)
+    for row in reader:
+        print(" ".join(row))
+ 
+#----------------------------------------------------------------------
+#if __name__ == "__main__":
+#    csv_path = "TB_data_dictionary_2014-02-26.csv"
+#    with open(csv_path, "rb") as f_obj:
+#        csv_reader(f_obj)
+'''
